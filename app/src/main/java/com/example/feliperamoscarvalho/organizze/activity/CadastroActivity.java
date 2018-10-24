@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 public class CadastroActivity extends AppCompatActivity {
 
@@ -73,9 +76,23 @@ public class CadastroActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar usuário!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(CadastroActivity.this, "Sucesso ao cadastrar usuário!", Toast.LENGTH_SHORT).show();
+                    finish();
                 }else {
-                    Toast.makeText(CadastroActivity.this, "Erro ao cadastrar usuário!", Toast.LENGTH_SHORT).show();
+                    String excecao = "";
+                    try{
+                        throw task.getException();
+                    }catch(FirebaseAuthWeakPasswordException e){
+                        excecao = "Digite uma senha mais forte!";
+                    }catch (FirebaseAuthInvalidCredentialsException e){
+                        excecao = "Digite um e-mail válido!";
+                    }catch (FirebaseAuthUserCollisionException e){
+                        excecao = "Essa conta já foi cadastrada!";
+                    }catch (Exception e){
+                        excecao = "Erro ao cadastrar usuário!" + e.getMessage();
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(CadastroActivity.this, excecao, Toast.LENGTH_SHORT).show();
                 }
             }
         });
